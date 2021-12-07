@@ -3,7 +3,6 @@ from fastapi import FastAPI
 import firebase_admin
 from firebase_admin import auth, firestore
 
-from typing import Optional
 import names
 import random
 import string
