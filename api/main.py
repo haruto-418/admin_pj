@@ -3,6 +3,7 @@ from fastapi import FastAPI
 import firebase_admin
 from firebase_admin import auth, firestore
 
+from typing import Optional
 import names
 import random
 import string
@@ -16,22 +17,6 @@ address_arr: str = [
     ""
 ]
 
-
-@app.post('/add')
-def create_user(name: str, email: str, password: str, address: str) -> None:
-    """
-    手動で名前・住所・メアド・パスワード（6文字以上）を入力することで新規ユーザーを作成。
-    メールアドレスが重複していた場合はエラーメッセージを返す。
-    """
-    try:
-        user: auth.UserRecord = auth.create_user(
-            email=email, password=password)
-        db.collection('users').add(
-            {'name': name, 'email': email, 'address': address})
-    except firebase_admin._auth_utils.EmailAlreadyExistsError:
-        return {'message': '同じメールアドレスを持つユーザーが既に存在しています'}
-
-
 @app.post('/add/random')
 def create_random_user(how_many_users: int) -> None:
     """
@@ -41,13 +26,24 @@ def create_random_user(how_many_users: int) -> None:
     """
     for _ in range(how_many_users):
         emailstr: str = ""
-        passwordstr: str = ""
         email: str = emailstr.join(
             [random.choice(string.ascii_letters) for _ in range(3)])+"@sample.com"
+
+        passwordstr: str = ""
         password: str = passwordstr.join(
             [random.choice(string.ascii_letters+string.digits) for _ in range(6)])
+
         name: str = names.get_first_name()
-        address: str = random.choice(address_arr)
+
+        with open('/src/api/assets/address_strings.csv','r')as f:
+            address_strings=[]
+            while True:
+                line=f.readline()
+                address_strings.append(line)
+                if not line:
+                    break
+        address: str = random.choice(address_strings)
+
         try:
             user: auth.UserRecord = auth.create_user(
                 email=email, password=password)
