@@ -12,10 +12,6 @@ firebase_admin.initialize_app()
 app: FastAPI = FastAPI()
 db: firestore = firestore.client()
 
-address_arr: str = [
-    ""
-]
-
 @app.post('/add/random')
 def create_random_user(how_many_users: int) -> None:
     """
