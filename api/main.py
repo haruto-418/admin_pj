@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, exceptions
 
 import firebase_admin
 from firebase_admin import auth, firestore
@@ -12,8 +12,10 @@ firebase_admin.initialize_app()
 app: FastAPI = FastAPI()
 db: firestore = firestore.client()
 
-@app.post('/add/random')
+
+@app.post('/users/add')
 def create_random_user(how_many_users: int) -> None:
+    print(db)
     """
     入力された整数分の名前・パスワード（6文字）は重複を考慮せずランダムに生成。
     メアドは重複した場合エラーメッセージを返しその処理を飛ばす。
@@ -30,19 +32,41 @@ def create_random_user(how_many_users: int) -> None:
 
         name: str = names.get_first_name()
 
-        with open('/src/api/assets/address_strings.csv','r')as f:
-            address_strings=[]
+        with open('/src/api/assets/address_strings.csv', 'r')as f:
+            address_strings = []
             while True:
-                line=f.readline()
+                line = f.readline()
                 address_strings.append(line)
                 if not line:
                     break
         address: str = random.choice(address_strings)
 
         try:
+
             user: auth.UserRecord = auth.create_user(
                 email=email, password=password)
+
             db.collection('users').add(
                 {'name': name, 'email': email, 'address': address})
-        except firebase_admin._auth_utils.EmailAlreadyExistsError:
-            return {'message': '同じメールアドレスを持つユーザーが存在するため、処理を飛ばします。'}
+        # except firebase_admin._auth_utils.EmailAlreadyExistsError:
+        #     return {'message': '同じメールアドレスを持つユーザーが存在するため、処理を飛ばします。'}
+
+        except:
+            raise exceptions.HTTPException(500, "error")
+
+
+@ app.delete('/users/delete')
+def delete_user():
+    pass
+
+
+@ app.post('/users/order/')
+def add_order():
+    db.collection('orders').add(
+        {
+            "createAt": "",
+            "customerID": "",
+            "deliveryAdrress": "",
+            "text": ""
+        }
+    )
