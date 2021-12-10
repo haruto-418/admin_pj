@@ -1,7 +1,5 @@
 {
   "projects": {
-    "pj": "favor-admin",
-    "default": "favor-admin"
-  },
-  "targets": {}
+    "default": "dev-favor"
+  }
 }
