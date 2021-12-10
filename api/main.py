@@ -3,6 +3,7 @@ from fastapi import FastAPI, exceptions
 import firebase_admin
 from firebase_admin import auth, firestore
 
+from typing import Generator
 import names
 import random
 import string
@@ -14,8 +15,7 @@ db: firestore = firestore.client()
 
 
 @app.post('/users/add')
-def create_random_user(how_many_users: int) -> None:
-    print(db)
+async def create_random_user(how_many_users: int) -> None:
     """
     入力された整数分の名前・パスワード（6文字）は重複を考慮せずランダムに生成。
     メアドは重複した場合エラーメッセージを返しその処理を飛ばす。
@@ -40,33 +40,33 @@ def create_random_user(how_many_users: int) -> None:
                 if not line:
                     break
         address: str = random.choice(address_strings)
-
         try:
-
             user: auth.UserRecord = auth.create_user(
                 email=email, password=password)
-
             db.collection('users').add(
                 {'name': name, 'email': email, 'address': address})
-        # except firebase_admin._auth_utils.EmailAlreadyExistsError:
-        #     return {'message': '同じメールアドレスを持つユーザーが存在するため、処理を飛ばします。'}
-
-        except:
-            raise exceptions.HTTPException(500, "error")
+        except firebase_admin._auth_utils.EmailAlreadyExistsError:
+            return {'message': '同じメールアドレスを持つユーザーが存在するため、処理を飛ばします。'}
 
 
-@ app.delete('/users/delete')
-def delete_user():
-    pass
-
+@ app.post('/users/delete')
+async def delete_user(how_many_users: int)->None:
+    """
+    指定した人数分、ユーザーを削除する。
+    """
+    user_ref:firestore.CollectionReference = db.collection('users')
+    users:Generator = user_ref.stream()
+    try:
+        for _ in range(how_many_users):
+            user=next(users)
+            await user_ref.document(user.id).delete()
+    except :
+        return {'error':'登録ユーザーは0人です。'}
+    
+    
 
 @ app.post('/users/order/')
-def add_order():
-    db.collection('orders').add(
-        {
-            "createAt": "",
-            "customerID": "",
-            "deliveryAdrress": "",
-            "text": ""
-        }
-    )
+def add_order(how_many_orders:int):
+    pass
+
+    
