@@ -71,3 +71,6 @@ __pycache__
 
 # GOOGLE_APPLICATION_CREDENTIALS
 admin-cred.json
+
+#memo.py
+memo.py
