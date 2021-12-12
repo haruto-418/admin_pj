@@ -11,6 +11,7 @@ import random
 
 from .common import functions
 from .common import models
+from .common import types
 
 firebase_admin.initialize_app()
 
@@ -37,7 +38,7 @@ async def create_random_user(how_many_users: int) -> None:
         except Exception as e:
             return {'firestore_error': e}
 
-        user = models.User(name, email, address)
+        user: models.User = models.User(name, email, address)
         user.create_account(password)
 
 
@@ -50,7 +51,7 @@ async def delete_user(how_many_users: int) -> None:
     users: Generator = user_ref.stream()
     try:
         for _ in range(how_many_users):
-            user = next(users)
+            user: firestore.DocumentSnapshot = next(users)
             user_ref.document(user.id).delete()
     except TypeError:
         return {'error': '登録ユーザーは0人です。'}
@@ -59,11 +60,11 @@ async def delete_user(how_many_users: int) -> None:
 
 
 @ app.post('/orders/add')
-def add_order(how_many_orders: int):
+def add_order(how_many_orders: int) -> None:
     """
     ユーザーを取得して、ID等を読み取り、それに基づいたオーダーを追加する。
     """
-    order_strings = []
+    order_strings: List[str] = []
 
     functions.read_file('/src/api/assets/order_strings.csv', order_strings)
 
@@ -72,7 +73,7 @@ def add_order(how_many_orders: int):
 
     user_list: List[List[str]] = []
     for _ in range(how_many_orders):
-        user = next(users)
+        user: firestore.DocumentSnapshot = next(users)
         user_data = user.to_dict()
         user_list.append([user.id, user_data['address']])
 
@@ -89,6 +90,7 @@ def add_order(how_many_orders: int):
                 'shopperId': '',
                 'text': random.choice(order_strings)
             })
+
     except TypeError:
         return {'error': 'ユーザーが足りていません。'}
     except Exception as e:
