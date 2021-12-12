@@ -17,5 +17,10 @@ class User(object):
         except:
             return {"error": "ユーザー登録に失敗しました。"}
 
-    def delete_account(self):
-        pass
+    def delete_account(uid):
+        try:
+            auth.delete_user(uid=uid)
+        except ValueError as e:
+            return {'authentication_error': 'ユーザーIDが不正です。.{}'.format(e)}
+        except Exception as e:
+            return {'authentication_error': 'ユーザーの削除に失敗しました。{}'.format(e)}
