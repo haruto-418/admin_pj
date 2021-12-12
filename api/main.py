@@ -67,20 +67,21 @@ def add_order(how_many_orders: int) -> None:
     """
     ユーザーを取得して、ID等を読み取り、それに基づいたオーダーを追加する。
     """
-    order_strings: List[str] = []
-
-    functions.read_file('/src/api/assets/order_strings.csv', order_strings)
+    def fetch_user_from_firestore(how_many_users: int, doc_ref: firestore.CollectionReference, arr: List[str]) -> None:
+        users: Generator = doc_ref.stream()
+        for _ in range(how_many_users):
+            user: firestore.DocumentSnapshot = next(users)
+            user_data: dict = user.to_dict()
+            arr.append([user.id, user_data['address']])
 
     user_ref: firestore.CollectionReference = db.collection('users')
-    users: Generator = user_ref.stream()
-
     user_list: List[List[str]] = []
-    for _ in range(how_many_orders):
-        user: firestore.DocumentSnapshot = next(users)
-        user_data = user.to_dict()
-        user_list.append([user.id, user_data['address']])
+
+    fetch_user_from_firestore(how_many_orders, user_ref, user_list)
 
     try:
+        order_strings: List[str] = []
+        functions.read_file('/src/api/assets/order_strings.csv', order_strings)
         for i in range(how_many_orders):
             db.collection('orders').add({
                 'createAt': firestore.SERVER_TIMESTAMP,
@@ -93,7 +94,6 @@ def add_order(how_many_orders: int) -> None:
                 'shopperId': '',
                 'text': random.choice(order_strings)
             })
-
     except TypeError:
         return {'error': 'ユーザーが足りていません。'}
     except Exception as e:
