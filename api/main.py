@@ -10,7 +10,8 @@ import names
 import random
 import string
 
-import functions
+from .common import functions
+from .common import models
 
 firebase_admin.initialize_app()
 
@@ -32,33 +33,18 @@ async def create_random_user(how_many_users: int) -> None:
     住所は東京都内の住所で重複を考慮せずランダムに生成。
     """
     for _ in range(how_many_users):
-        emailstr: str = ""
-        email: str = emailstr.join(
-            [random.choice(string.ascii_letters) for _ in range(3)])+"@sample.com"
-
-        passwordstr: str = ""
-        password: str = passwordstr.join(
-            [random.choice(string.ascii_letters+string.digits) for _ in range(6)])
-
+        email:str=functions.create_random_strings(False,3)+'@sample.com'
+        password:str=functions.create_random_strings(True,6)
         name: str = names.get_first_name()
-
-        with open('/src/api/assets/address_strings.csv', 'r')as f:
-            address_strings = []
-            while True:
-                line = f.readline()
-                address_strings.append(line)
-                if not line:
-                    break
-        address: str = random.choice(address_strings)
+        address:str=functions.extract_from_file('/src/api/assets/address_strings.csv')
         try:
-            user: auth.UserRecord = auth.create_user(
-                email=email, password=password)
             db.collection('users').add(
                 {'name': name, 'email': email, 'address': address})
-        except firebase_admin._auth_utils.EmailAlreadyExistsError:
-            return {'error': '同じメールアドレスを持つユーザーが存在するため、処理を飛ばします。'}
         except Exception as e:
-            return {'error': e}
+            return {'firestore_error':e}
+
+        user=models.User(name,email,address)
+        user.create_account(password)
 
 # TODO: (kikuchi) rename the endpoits.
 # TODO: (kikuchi) change the HTTP method.
@@ -88,13 +74,10 @@ def add_order(how_many_orders: int):
     """
     ユーザーを取得して、ID等を読み取り、それに基づいたオーダーを追加する。
     """
-    with open('/src/api/assets/order_strings.csv', 'r')as f:
-        order_strings = []
-        while True:
-            line = f.readline()
-            if not line:
-                break
-            order_strings.append(line)
+    order_strings = []
+
+    functions.read_file('/src/api/assets/order_strings.csv', order_strings)
+
     user_ref: firestore.CollectionReference = db.collection('users')
     users: Generator = user_ref.stream()
 
@@ -121,3 +104,6 @@ def add_order(how_many_orders: int):
         return {'error': 'ユーザーが足りていません。'}
     except Exception as e:
         return {'error': e}
+
+
+
