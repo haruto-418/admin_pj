@@ -3,7 +3,13 @@ services:
   demo-app:
     build: .
     volumes:
+      - ~/.ssh/:/root/.ssh
       - .dockervenv:/src/.venv
       - .:/src
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: '/src/admin-cred.json'
+      FIRESTORE_EMULATOR_HOST: 'host.docker.internal:8080'
+      FIREBASE_AUTH_EMULATOR_HOST: 'host.docker.internal:9099'
+      GCLOUD_PROJECT: 'dev-favor'
     ports:
       - 8000:8000

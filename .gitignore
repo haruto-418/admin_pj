@@ -64,3 +64,16 @@ node_modules/
 
 # dotenv environment variables file
 .env
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+__pycache__
+
+# GOOGLE_APPLICATION_CREDENTIALS
+admin-cred.json
+
+#memo.py
+memo.py
+
+# sample directly
+sample/
