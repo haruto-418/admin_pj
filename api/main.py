@@ -54,12 +54,12 @@ async def delete_user(how_many_users: int) -> None:
         for _ in range(how_many_users):
             user: firestore.DocumentSnapshot = next(users)
             uid: str = user.id
-            auth.delete_user(uid)
             user_ref.document(uid).delete()
-    except TypeError:
-        return {'error': '登録ユーザーは0人です。'}
+            models.User.delete_account(uid)
+    except TypeError as e:
+        return {'firestore_error': '登録ユーザーは0人です。{}'.format(e)}
     except Exception as e:
-        return {'error': e}
+        return {'firestore_error': e}
 
 
 @ app.post('/orders/add')
