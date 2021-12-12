@@ -10,6 +10,8 @@ import names
 import random
 import string
 
+import functions
+
 firebase_admin.initialize_app()
 
 app: FastAPI = FastAPI()
@@ -54,7 +56,9 @@ async def create_random_user(how_many_users: int) -> None:
             db.collection('users').add(
                 {'name': name, 'email': email, 'address': address})
         except firebase_admin._auth_utils.EmailAlreadyExistsError:
-            return {'message': '同じメールアドレスを持つユーザーが存在するため、処理を飛ばします。'}
+            return {'error': '同じメールアドレスを持つユーザーが存在するため、処理を飛ばします。'}
+        except Exception as e:
+            return {'error': e}
 
 # TODO: (kikuchi) rename the endpoits.
 # TODO: (kikuchi) change the HTTP method.
@@ -71,8 +75,10 @@ async def delete_user(how_many_users: int) -> None:
         for _ in range(how_many_users):
             user = next(users)
             user_ref.document(user.id).delete()
-    except:
+    except TypeError:
         return {'error': '登録ユーザーは0人です。'}
+    except Exception as e:
+        return {'error': e}
 
 # TODO: (kikuchi) rename the endpoits.
 
@@ -111,5 +117,7 @@ def add_order(how_many_orders: int):
                 'shopperId': '',
                 'text': random.choice(order_strings)
             })
-    except:
+    except TypeError:
         return {'error': 'ユーザーが足りていません。'}
+    except Exception as e:
+        return {'error': e}
