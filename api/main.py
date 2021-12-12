@@ -10,7 +10,7 @@ import names
 import random
 import string
 
-import functions
+from .common import functions
 
 firebase_admin.initialize_app()
 
@@ -42,13 +42,11 @@ async def create_random_user(how_many_users: int) -> None:
 
         name: str = names.get_first_name()
 
-        with open('/src/api/assets/address_strings.csv', 'r')as f:
-            address_strings = []
-            while True:
-                line = f.readline()
-                address_strings.append(line)
-                if not line:
-                    break
+        address_strings: List[str] = []
+
+        functions.read_file(
+            '/src/api/assets/address_strings.csv', address_strings)
+
         address: str = random.choice(address_strings)
         try:
             user: auth.UserRecord = auth.create_user(
@@ -88,13 +86,10 @@ def add_order(how_many_orders: int):
     """
     ユーザーを取得して、ID等を読み取り、それに基づいたオーダーを追加する。
     """
-    with open('/src/api/assets/order_strings.csv', 'r')as f:
-        order_strings = []
-        while True:
-            line = f.readline()
-            if not line:
-                break
-            order_strings.append(line)
+    order_strings = []
+
+    functions.read_file('/src/api/assets/order_strings.csv', order_strings)
+
     user_ref: firestore.CollectionReference = db.collection('users')
     users: Generator = user_ref.stream()
 
@@ -121,3 +116,21 @@ def add_order(how_many_orders: int):
         return {'error': 'ユーザーが足りていません。'}
     except Exception as e:
         return {'error': e}
+
+
+##################################
+
+class User(object):
+    def __init__(self, name, email, address):
+        self.name = name
+        self.email = email
+        self.address = address
+
+    def create_account(self):
+        try:
+            auth.create_user(email=self.email, password=self.password)
+        except:
+            return {"error": "ユーザー登録に失敗しました。"}
+
+    def delete_account(self):
+        pass
