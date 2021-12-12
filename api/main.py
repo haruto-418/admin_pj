@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 
 import firebase_admin
+from firebase_admin import auth
 from firebase_admin import firestore
 
 from typing import Generator, List
@@ -32,14 +33,14 @@ async def create_random_user(how_many_users: int) -> None:
         name: str = names.get_first_name()
         address: str = functions.extract_from_file(
             '/src/api/assets/address_strings.csv')
+
+        user: models.User = models.User(name, email, address)
+        uid: str = user.create_account(password)
         try:
-            db.collection('users').add(
+            db.collection('users').document(uid).set(
                 {'name': name, 'email': email, 'address': address})
         except Exception as e:
             return {'firestore_error': e}
-
-        user: models.User = models.User(name, email, address)
-        user.create_account(password)
 
 
 @ app.post('/users/delete')
@@ -52,7 +53,9 @@ async def delete_user(how_many_users: int) -> None:
     try:
         for _ in range(how_many_users):
             user: firestore.DocumentSnapshot = next(users)
-            user_ref.document(user.id).delete()
+            uid: str = user.id
+            auth.delete_user(uid)
+            user_ref.document(uid).delete()
     except TypeError:
         return {'error': '登録ユーザーは0人です。'}
     except Exception as e:

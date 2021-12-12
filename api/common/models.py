@@ -7,9 +7,13 @@ class User(object):
         self.email = email
         self.address = address
 
-    def create_account(self,password):
+    def create_account(self, password):
+        """
+        ユーザー登録し、uidを返す関数。
+        """
         try:
-            auth.create_user(email=self.email, password=password)
+            user = auth.create_user(email=self.email, password=password)
+            return user.uid
         except:
             return {"error": "ユーザー登録に失敗しました。"}
 
