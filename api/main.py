@@ -32,22 +32,14 @@ async def create_random_user(how_many_users: int) -> None:
     住所は東京都内の住所で重複を考慮せずランダムに生成。
     """
     for _ in range(how_many_users):
-        emailstr: str = ""
-        email: str = emailstr.join(
-            [random.choice(string.ascii_letters) for _ in range(3)])+"@sample.com"
+        email:str=functions.create_random_strings(False,3)+'@sample.com'
 
-        passwordstr: str = ""
-        password: str = passwordstr.join(
-            [random.choice(string.ascii_letters+string.digits) for _ in range(6)])
-
+        password:str=functions.create_random_strings(True,6)
+        
         name: str = names.get_first_name()
+        
+        address:str=functions.extract_from_file('/src/api/assets/address_strings.csv')
 
-        address_strings: List[str] = []
-
-        functions.read_file(
-            '/src/api/assets/address_strings.csv', address_strings)
-
-        address: str = random.choice(address_strings)
         try:
             user: auth.UserRecord = auth.create_user(
                 email=email, password=password)
