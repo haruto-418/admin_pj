@@ -84,9 +84,9 @@ def add_order(how_many_orders: int):
         order_strings = []
         while True:
             line = f.readline()
-            order_strings.append(line)
             if not line:
                 break
+            order_strings.append(line)
     user_ref: firestore.CollectionReference = db.collection('users')
     users: Generator = user_ref.stream()
 
@@ -96,15 +96,18 @@ def add_order(how_many_orders: int):
         user_data = user.to_dict()
         user_list.append([user.id, user_data['address']])
 
-    for i in range(how_many_orders):
-        db.collection('orders').add({
-            'createAt': '',
-            'customerId': user_list[i][0],
-            'deliveryAddress': user_list[i][1],
-            'deliveryCharge': 0,
-            'deliveryPoint': '',
-            'maxQuotationPrice': 0,
-            'minQuotationPrice': 0,
-            'shopperId': '',
-            'text': ''
-        })
+    try:
+        for i in range(how_many_orders):
+            db.collection('orders').add({
+                'createAt': firestore.SERVER_TIMESTAMP,
+                'customerId': user_list[i][0],
+                'deliveryAddress': user_list[i][1],
+                'deliveryCharge': 0,
+                'deliveryPoint': '',
+                'maxQuotationPrice': 0,
+                'minQuotationPrice': 0,
+                'shopperId': '',
+                'text': random.choice(order_strings)
+            })
+    except:
+        return {'error': 'ユーザーが足りていません。'}
