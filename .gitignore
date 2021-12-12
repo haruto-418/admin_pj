@@ -76,4 +76,7 @@ admin-cred.json
 memo.py
 
 # sample directly
-sample/
+sample/ 
+
+# .DS_Store
+.DS_Store
