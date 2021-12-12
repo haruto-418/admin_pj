@@ -1,14 +1,13 @@
 from fastapi import FastAPI
-from fastapi import exceptions
+
 
 import firebase_admin
-from firebase_admin import auth
 from firebase_admin import firestore
 
 from typing import Generator, List
 import names
 import random
-import string
+
 
 from .common import functions
 from .common import models
@@ -33,17 +32,18 @@ async def create_random_user(how_many_users: int) -> None:
     住所は東京都内の住所で重複を考慮せずランダムに生成。
     """
     for _ in range(how_many_users):
-        email:str=functions.create_random_strings(False,3)+'@sample.com'
-        password:str=functions.create_random_strings(True,6)
+        email: str = functions.create_random_strings(False, 3)+'@sample.com'
+        password: str = functions.create_random_strings(True, 6)
         name: str = names.get_first_name()
-        address:str=functions.extract_from_file('/src/api/assets/address_strings.csv')
+        address: str = functions.extract_from_file(
+            '/src/api/assets/address_strings.csv')
         try:
             db.collection('users').add(
                 {'name': name, 'email': email, 'address': address})
         except Exception as e:
-            return {'firestore_error':e}
+            return {'firestore_error': e}
 
-        user=models.User(name,email,address)
+        user = models.User(name, email, address)
         user.create_account(password)
 
 # TODO: (kikuchi) rename the endpoits.
@@ -104,6 +104,3 @@ def add_order(how_many_orders: int):
         return {'error': 'ユーザーが足りていません。'}
     except Exception as e:
         return {'error': e}
-
-
-
