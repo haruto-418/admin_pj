@@ -11,6 +11,7 @@ import random
 import string
 
 from .common import functions
+from .common import models
 
 firebase_admin.initialize_app()
 
@@ -33,22 +34,17 @@ async def create_random_user(how_many_users: int) -> None:
     """
     for _ in range(how_many_users):
         email:str=functions.create_random_strings(False,3)+'@sample.com'
-
         password:str=functions.create_random_strings(True,6)
-        
         name: str = names.get_first_name()
-        
         address:str=functions.extract_from_file('/src/api/assets/address_strings.csv')
-
         try:
-            user: auth.UserRecord = auth.create_user(
-                email=email, password=password)
             db.collection('users').add(
                 {'name': name, 'email': email, 'address': address})
-        except firebase_admin._auth_utils.EmailAlreadyExistsError:
-            return {'error': '同じメールアドレスを持つユーザーが存在するため、処理を飛ばします。'}
         except Exception as e:
-            return {'error': e}
+            return {'firestore_error':e}
+
+        user=models.User(name,email,address)
+        user.create_account(password)
 
 # TODO: (kikuchi) rename the endpoits.
 # TODO: (kikuchi) change the HTTP method.
@@ -110,19 +106,4 @@ def add_order(how_many_orders: int):
         return {'error': e}
 
 
-##################################
 
-class User(object):
-    def __init__(self, name, email, address):
-        self.name = name
-        self.email = email
-        self.address = address
-
-    def create_account(self):
-        try:
-            auth.create_user(email=self.email, password=self.password)
-        except:
-            return {"error": "ユーザー登録に失敗しました。"}
-
-    def delete_account(self):
-        pass
