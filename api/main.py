@@ -17,12 +17,6 @@ firebase_admin.initialize_app()
 app: FastAPI = FastAPI()
 db: firestore = firestore.client()
 
-# TODO: (kikuchi) make tests of each functions.
-
-# TODO: (kikuchi) rename the endpoits.
-
-# TODO: (kikuchi) handle some errors.
-
 
 @app.post('/users/add')
 async def create_random_user(how_many_users: int) -> None:
@@ -46,9 +40,6 @@ async def create_random_user(how_many_users: int) -> None:
         user = models.User(name, email, address)
         user.create_account(password)
 
-# TODO: (kikuchi) rename the endpoits.
-# TODO: (kikuchi) change the HTTP method.
-
 
 @ app.post('/users/delete')
 async def delete_user(how_many_users: int) -> None:
@@ -65,8 +56,6 @@ async def delete_user(how_many_users: int) -> None:
         return {'error': '登録ユーザーは0人です。'}
     except Exception as e:
         return {'error': e}
-
-# TODO: (kikuchi) rename the endpoits.
 
 
 @ app.post('/orders/add')
