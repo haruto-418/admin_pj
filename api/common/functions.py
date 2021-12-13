@@ -2,16 +2,22 @@ from typing import List
 import random
 import string
 
-def read_file(path:str,arr:List[str])->None:
-    """
-    外部ファイルを読み込み、配列に組み込む関数。
-    """
-    with open (path,'r')as f:
-        while True:
-            line=f.readline()
-            if not line:
-                break
-            arr.append(line)
+class File(object):
+    @staticmethod
+    def read_file(path:str,arr:List[str])->None:
+        with open (path,'r')as f:
+            while True:
+                line=f.readline()
+                if not line:
+                    break
+                arr.append(line)
+    @staticmethod
+    def extract_from_file(path:str)->List[str]:
+        arr=[]
+        File.read_file(path,arr)
+        return random.choice(arr)
+
+
 
 def create_random_strings(is_digit:bool,characters:int):
     """
@@ -22,21 +28,7 @@ def create_random_strings(is_digit:bool,characters:int):
     else:
         return "".join([random.choice(string.ascii_letters) for _ in range(characters)])
 
-def extract_from_file(path:str)->None:
-    """
-    外部ファイルを読み込み、配列に組み込む関数。
-    """
-    arr=[]
-    with open (path,'r')as f:
-        while True:
-            line=f.readline()
-            if not line:
-                break
-            arr.append(line)
-    return random.choice(arr)
-
-
     
 if __name__=='__main__':
-    a=create_random_strings(False,6)
+    a=File.extract_from_file('/src/api/assets/order_strings.csv')
     print(a)
