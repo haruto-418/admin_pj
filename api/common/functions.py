@@ -17,11 +17,10 @@ def create_random_strings(is_digit:bool,characters:int):
     """
     ランダムな文字列を生成する関数。
     """
-    empty_str:str=""
     if is_digit:
-        return empty_str.join([random.choice(string.ascii_letters+string.digits) for _ in range(characters)])
+        return "".join([random.choice(string.ascii_letters+string.digits) for _ in range(characters)])
     else:
-        return empty_str.join([random.choice(string.ascii_letters) for _ in range(characters)])
+        return "".join([random.choice(string.ascii_letters) for _ in range(characters)])
 
 def extract_from_file(path:str)->None:
     """
@@ -39,5 +38,5 @@ def extract_from_file(path:str)->None:
 
     
 if __name__=='__main__':
-    a=create_random_strings(True,6)
+    a=create_random_strings(False,6)
     print(a)

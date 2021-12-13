@@ -12,7 +12,7 @@ import random
 
 from .common import functions
 from .common import models
-from .common import types
+from .common import type_classes
 
 firebase_admin.initialize_app()
 
