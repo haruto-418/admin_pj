@@ -31,7 +31,7 @@ async def create_random_user(how_many_users: int) -> None:
         email: str = functions.create_random_strings(False, 3)+'@sample.com'
         password: str = functions.create_random_strings(True, 6)
         name: str = names.get_first_name()
-        address: str = functions.extract_from_file(
+        address: str = functions.File.extract_from_file(
             '/src/api/assets/address_strings.csv')
 
         user: models.User = models.User(name, email, address)
@@ -69,7 +69,7 @@ def add_order(how_many_orders: int) -> None:
     """
     order_strings: List[str] = []
 
-    functions.read_file('/src/api/assets/order_strings.csv', order_strings)
+    functions.File.read_file('/src/api/assets/order_strings.csv', order_strings)
 
     user_ref: firestore.CollectionReference = db.collection('users')
     users: Generator = user_ref.stream()
