@@ -20,7 +20,7 @@ app: FastAPI = FastAPI()
 db: firestore = firestore.client()
 
 
-@app.post('/users/add')
+@app.post('/users')
 async def create_random_user(how_many_users: int) -> None:
     """
     入力された整数分の名前・パスワード（6文字）は重複を考慮せずランダムに生成。
@@ -43,7 +43,7 @@ async def create_random_user(how_many_users: int) -> None:
             return {'firestore_error': e}
 
 
-@ app.post('/users/delete')
+@ app.delete('/users')
 async def delete_user(how_many_users: int) -> None:
     """
     指定した人数分、ユーザーを削除する。
@@ -62,7 +62,7 @@ async def delete_user(how_many_users: int) -> None:
         return {'firestore_error': e}
 
 
-@ app.post('/orders/add')
+@ app.post('/orders')
 def add_order(how_many_orders: int) -> None:
     """
     ユーザーを取得して、ID等を読み取り、それに基づいたオーダーを追加する。
