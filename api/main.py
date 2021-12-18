@@ -18,7 +18,7 @@ except ModuleNotFoundError:
     from .common import models
     from .common import type_classes
 
-if __name__=='api.main':
+if __name__ == 'api.main':
     app: FastAPI = FastAPI()
     firebase_admin.initialize_app()
     db: firestore = firestore.client()
@@ -39,12 +39,6 @@ async def create_random_user(how_many_users: int) -> None:
             '/src/api/assets/address_strings.csv')
 
         user: models.User = models.User(name, email, address)
-        uid: str = user.create_account(password)
-        try:
-            db.collection('users').document(uid).set(
-                {'name': name, 'email': email, 'address': address})
-        except Exception as e:
-            return {'firestore_error': e}
 
 
 @ app.delete('/users')
