@@ -9,7 +9,7 @@ class User(object):
         self.email: str = email
         self.address: str = address
 
-    def create_account(self, password: str, db_ref: firestore):
+    def create_account(self, password: str, db_ref: firestore) -> str:
         """
         firebase_authenticationとfirestoreにユーザーを作成する関数。
         """
