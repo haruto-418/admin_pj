@@ -1,21 +1,27 @@
+import firebase_admin
 from firebase_admin import auth
+from firebase_admin import firestore
 
 
 class User(object):
-    def __init__(self, name, email, address):
-        self.name = name
-        self.email = email
-        self.address = address
+    def __init__(self, name: str, email: str, address: str):
+        self.name: str = name
+        self.email: str = email
+        self.address: str = address
 
-    def create_account(self, password):
+    def create_account(self, password: str, db_ref: firestore):
         """
-        ユーザー登録し、uidを返す関数。
+        firebase_authenticationとfirestoreにユーザーを作成する関数。
         """
         try:
-            user = auth.create_user(email=self.email, password=password)
+            user: auth.UserRecord = auth.create_user(
+                email=self.email, password=password)
+            db_ref.collection('users').document(user.uid).set(
+                {'name': self.name, 'email': self.email, 'address': self.address}
+            )
             return user.uid
-        except:
-            return {"error": "ユーザー登録に失敗しました。"}
+        except Exception as e:
+            return {"error": "ユーザー登録に失敗しました。", "error": e}
 
     def delete_account(uid):
         try:
