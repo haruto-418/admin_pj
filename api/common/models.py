@@ -9,14 +9,14 @@ class User(object):
         self.email: str = email
         self.address: str = address
 
-    def create_account(self, password: str, db_ref: firestore):
+    def create_account(self, password: str, db_instance: firestore):
         """
         firebase_authenticationとfirestoreにユーザーを作成する関数。
         """
         try:
             user: auth.UserRecord = auth.create_user(
                 email=self.email, password=password)
-            db_ref.collection('users').document(user.uid).set(
+            db_instance.collection('users').document(user.uid).set(
                 {'name': self.name, 'email': self.email, 'address': self.address}
             )
             return user.uid
