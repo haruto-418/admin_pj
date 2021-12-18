@@ -18,12 +18,10 @@ except ModuleNotFoundError:
     from .common import models
     from .common import type_classes
 
-
-
-firebase_admin.initialize_app()
-
-app: FastAPI = FastAPI()
-db: firestore = firestore.client()
+if __name__=='api.main':
+    app: FastAPI = FastAPI()
+    firebase_admin.initialize_app()
+    db: firestore = firestore.client()
 
 
 @app.post('/users')
@@ -75,7 +73,8 @@ def add_order(how_many_orders: int) -> None:
     """
     order_strings: List[str] = []
 
-    functions.File.read_file('/src/api/assets/order_strings.csv', order_strings)
+    functions.File.read_file(
+        '/src/api/assets/order_strings.csv', order_strings)
 
     user_ref: firestore.CollectionReference = db.collection('users')
     users: Generator = user_ref.stream()
