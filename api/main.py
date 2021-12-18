@@ -25,23 +25,27 @@ if __name__ == 'api.main':
 
 
 @app.post('/users')
-async def create_random_user(how_many_users: int) -> None:
+async def create_random_user(how_many_users: int) -> dict:
     """
     入力された整数分の名前・パスワード（6文字）は重複を考慮せずランダムに生成。
     メアドは重複した場合エラーメッセージを返しその処理を飛ばす。
     住所は東京都内の住所で重複を考慮せずランダムに生成。
     """
+    user_id_arr: List[str] = []
     for _ in range(how_many_users):
-        email: str = functions.create_random_strings(False, 3)+'@sample.com'
-        password: str = functions.create_random_strings(True, 6)
         name: str = names.get_first_name()
+        email: str = functions.create_random_strings(False, 3)+'@sample.com'
         address: str = functions.File.extract_from_file(
             '/src/api/assets/address_strings.csv')
+        password: str = functions.create_random_strings(True, 6)
 
         user: models.User = models.User(name, email, address)
+        user_id: str = user.create_account(password, db)
+        user_id_arr.append(user_id)
+    return {"created_user_ids": user_id_arr}
 
 
-@ app.delete('/users')
+@app.delete('/users')
 async def delete_user(how_many_users: int) -> None:
     """
     指定した人数分、ユーザーを削除する。
@@ -60,7 +64,7 @@ async def delete_user(how_many_users: int) -> None:
         return {'firestore_error': e}
 
 
-@ app.post('/orders')
+@app.post('/orders')
 def add_order(how_many_orders: int) -> None:
     """
     ユーザーを取得して、ID等を読み取り、それに基づいたオーダーを追加する。
