@@ -9,10 +9,16 @@ from typing import Generator, List
 import names
 import random
 
+try:
+    from common import functions
+    from common import models
+    from common import type_classes
+except ModuleNotFoundError:
+    from .common import functions
+    from .common import models
+    from .common import type_classes
 
-from .common import functions
-from .common import models
-from .common import type_classes
+
 
 firebase_admin.initialize_app()
 
