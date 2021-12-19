@@ -47,17 +47,14 @@ async def delete_user(how_many_users: int) -> None:
     指定した人数分、ユーザーを削除する。
     """
     user_ref: firestore.CollectionReference = db.collection('users')
-    users: Generator = user_ref.stream()
     try:
         for _ in range(how_many_users):
-            user: firestore.DocumentSnapshot = next(users)
-            uid: str = user.id
-            user_ref.document(uid).delete()
-            models.User.delete_account(uid)
+            models.User.delete_account(user_ref)
+        return {'200':'success!'}
     except TypeError as e:
         return {'firestore_error': '登録ユーザーは0人です。{}'.format(e)}
     except Exception as e:
-        return {'firestore_error': e}
+        return {'error': e}
 
 
 @app.post('/orders')

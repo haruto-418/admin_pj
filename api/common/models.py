@@ -2,16 +2,17 @@ import firebase_admin
 from firebase_admin import auth
 from firebase_admin import firestore
 
+try:
+    from functions import FirestoreFunc
+except ModuleNotFoundError:
+    from .functions import FirestoreFunc
+
 
 class User(object):
     def __init__(self, name: str, email: str, address: str):
         self.name: str = name
         self.email: str = email
         self.address: str = address
-
-    @classmethod
-    async def __init_with_id__(cls,user_id):
-        
 
     def create_account(self, password: str, db_ref: firestore) -> str:
         """
@@ -27,9 +28,11 @@ class User(object):
         except Exception as e:
             return {"error": "ユーザー登録に失敗しました。", "error": e}
 
-    def delete_account(uid):
+    def delete_account(collection_ref):
         try:
-            auth.delete_user(uid=uid)
+            user_id = FirestoreFunc.get_document_id(collection_ref)
+            collection_ref.document(user_id).delete()
+            auth.delete_user(uid=user_id)
         except ValueError as e:
             return {'authentication_error': 'ユーザーIDが不正です。.{}'.format(e)}
         except Exception as e:
