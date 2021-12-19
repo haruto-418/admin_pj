@@ -9,6 +9,10 @@ class User(object):
         self.email: str = email
         self.address: str = address
 
+    @classmethod
+    async def __init_with_id__(cls,user_id):
+        
+
     def create_account(self, password: str, db_ref: firestore) -> str:
         """
         firebase_authenticationとfirestoreにユーザーを作成する関数。
