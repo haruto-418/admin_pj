@@ -109,6 +109,6 @@ def add_order(how_many_orders: int) -> None:
         return {'200': 'success!'}
 
     except TypeError:
-        return {'error': 'There are not enogh amount of users.'}
+        return {'error': 'There are not enough amount of users.'}
     except Exception as e:
         return {'error': e}
