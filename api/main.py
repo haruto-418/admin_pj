@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-
+from fastapi.exceptions import HTTPException
 
 import firebase_admin
 from firebase_admin import auth
@@ -32,17 +32,19 @@ async def create_random_user(how_many_users: int) -> dict:
     住所は東京都内の住所で重複を考慮せずランダムに生成。
     """
     user_id_arr: List[str] = []
-    for _ in range(how_many_users):
-        name: str = names.get_first_name()
-        email: str = functions.create_random_strings(False, 3)+'@sample.com'
-        address: str = functions.File.extract_from_file(
-            '/src/api/assets/address_strings.csv')
-        password: str = functions.create_random_strings(True, 6)
+    try:
+        for _ in range(how_many_users):
+            name: str = names.get_first_name()
+            email: str = functions.create_random_strings(
+                False, 3)+'@sample.com'
+            address: str = functions.File.extract_from_file(
+                '/src/api/assets/address_strings.csv')
+            password: str = functions.create_random_strings(True, 6)
 
-        user: models.User = models.User(name, email, address)
-        user_id: str = user.create_account(password, db)
-        user_id_arr.append(user_id)
-    return {"created_user_ids": user_id_arr}
+            user: models.User = models.User(name, email, address)
+        return {'200', 'success!'}
+    except Exception as e:
+        return {'error':e}
 
 
 @app.delete('/users')
@@ -58,8 +60,10 @@ async def delete_user(how_many_users: int) -> None:
             uid: str = user.id
             user_ref.document(uid).delete()
             models.User.delete_account(uid)
+        return {'200':'success!'}
     except TypeError as e:
-        return {'firestore_error': '登録ユーザーは0人です。{}'.format(e)}
+        return {'firestore_error': '登録ユーザーは0人です。',
+                'error': e}
     except Exception as e:
         return {'firestore_error': e}
 
@@ -96,6 +100,7 @@ def add_order(how_many_orders: int) -> None:
                 'shopperId': '',
                 'text': random.choice(order_strings)
             })
+        return {'200':'success!'}
 
     except TypeError:
         return {'error': 'ユーザーが足りていません。'}
