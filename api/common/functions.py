@@ -35,6 +35,20 @@ class FirestoreFunc(object):
         data: firestore.DocumentSnapshot = next(data_generator)
         return data.id
 
+    @staticmethod
+    def get_all_document_id(db: firestore, coll_name: str) -> List[str]:
+        id_arr: List[str] = []
+        docs: Generator = db.collection(coll_name).stream()
+        for doc in docs:
+            id_arr.append(doc.id)
+        return id_arr
+
+    @staticmethod
+    def delete_all(db: firestore, coll_name: str) -> None:
+        docs: Generator = db.collection(coll_name).stream()
+        for doc in docs:
+            doc.reference.delete()
+
 
 def create_random_strings(is_digit: bool, characters: int):
     """
