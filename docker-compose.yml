@@ -1,6 +1,6 @@
 version: '3'
 services:
-  demo-app:
+  favor_admin:
     build: .
     volumes:
       - ~/.ssh/:/root/.ssh
@@ -12,4 +12,4 @@ services:
       FIREBASE_AUTH_EMULATOR_HOST: 'host.docker.internal:9099'
       GCLOUD_PROJECT: 'dev-favor'
     ports:
-      - 8000:8000
+      - 8001:8001

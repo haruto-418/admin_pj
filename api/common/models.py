@@ -1,26 +1,39 @@
+import firebase_admin
 from firebase_admin import auth
+from firebase_admin import firestore
+
+try:
+    from functions import FirestoreFunc
+except ModuleNotFoundError:
+    from .functions import FirestoreFunc
 
 
 class User(object):
-    def __init__(self, name, email, address):
-        self.name = name
-        self.email = email
-        self.address = address
+    def __init__(self, name: str, email: str, address: str) -> None:
+        self.name: str = name
+        self.email: str = email
+        self.address: str = address
 
-    def create_account(self, password):
+    def create_account(self, password: str, db_ref: firestore) -> None:
         """
-        ユーザー登録し、uidを返す関数。
+        firebase_authenticationとfirestoreにユーザーを作成する関数。
         """
         try:
-            user = auth.create_user(email=self.email, password=password)
-            return user.uid
-        except:
-            return {"error": "ユーザー登録に失敗しました。"}
-
-    def delete_account(uid):
-        try:
-            auth.delete_user(uid=uid)
-        except ValueError as e:
-            return {'authentication_error': 'ユーザーIDが不正です。.{}'.format(e)}
+            user: auth.UserRecord = auth.create_user(
+                email=self.email, password=password)
+            db_ref.collection('users').document(user.uid).set(
+                {'name': self.name, 'email': self.email, 'address': self.address}
+            )
         except Exception as e:
-            return {'authentication_error': 'ユーザーの削除に失敗しました。{}'.format(e)}
+            return {"error": "fail to create user.", "error": e}
+
+    @staticmethod
+    def delete_account(collection_ref) -> None:
+        try:
+            user_id = FirestoreFunc.get_document_id(collection_ref)
+            collection_ref.document(user_id).delete()
+            auth.delete_user(uid=user_id)
+        except ValueError as e:
+            return {'authentication_error': 'The uid is invalid.{}'.format(e)}
+        except Exception as e:
+            return {'authentication_error': 'fail to delete user.{}'.format(e)}
