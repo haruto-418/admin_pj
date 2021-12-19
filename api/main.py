@@ -27,7 +27,6 @@ async def create_random_user(how_many_users: int) -> dict:
     """
     ユーザーを指定の人数作成する関数。
     """
-    user_id_arr: List[str] = []
     try:
         for _ in range(how_many_users):
             name: str = names.get_first_name()
@@ -38,7 +37,9 @@ async def create_random_user(how_many_users: int) -> dict:
             password: str = functions.create_random_strings(True, 6)
 
             user: models.User = models.User(name, email, address)
-        return {'200', 'success!'}
+            user.create_account(password, db)
+
+        return {'200': 'success!'}
     except Exception as e:
         return {'error': e}
 
@@ -56,6 +57,19 @@ async def delete_user(how_many_users: int) -> dict:
     except TypeError as e:
         return {'firestore_error': 'There are no users.',
                 'error': e}
+    except Exception as e:
+        return {'error': e}
+
+
+@app.delete('/users/all')
+async def delete_all_users() -> dict:
+    """ユーザを全て削除する。"""
+    try:
+        id_arr: List[str] = functions.FirestoreFunc.get_all_document_id(
+            db, 'users')
+        functions.FirestoreFunc.delete_all(db, 'users')
+        auth.delete_users(id_arr)
+        return {'200': 'success!'}
     except Exception as e:
         return {'error': e}
 

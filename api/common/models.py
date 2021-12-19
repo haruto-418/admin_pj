@@ -14,7 +14,7 @@ class User(object):
         self.email: str = email
         self.address: str = address
 
-    def create_account(self, password: str, db_ref: firestore) -> str:
+    def create_account(self, password: str, db_ref: firestore) -> None:
         """
         firebase_authenticationとfirestoreにユーザーを作成する関数。
         """
@@ -24,7 +24,6 @@ class User(object):
             db_ref.collection('users').document(user.uid).set(
                 {'name': self.name, 'email': self.email, 'address': self.address}
             )
-            return user.uid
         except Exception as e:
             return {"error": "fail to create user.", "error": e}
 
