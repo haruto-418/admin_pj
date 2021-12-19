@@ -1,25 +1,42 @@
+from firebase_admin import firestore
+
+from typing import Generator
 from typing import List
+from typing import Optional
 import random
 import string
 
+
 class File(object):
     @staticmethod
-    def read_file(path:str,arr:List[str])->None:
-        with open (path,'r')as f:
+    def read_file(path: str, arr: List[str]) -> None:
+        with open(path, 'r')as f:
             while True:
-                line=f.readline()
+                line = f.readline()
                 if not line:
                     break
                 arr.append(line)
+
     @staticmethod
-    def extract_from_file(path:str)->List[str]:
-        arr=[]
-        File.read_file(path,arr)
+    def extract_from_file(path: str) -> List[str]:
+        arr = []
+        File.read_file(path, arr)
         return random.choice(arr)
 
 
+class FirestoreFunc(object):
+    @staticmethod
+    def get_collection_ref(db: firestore, collection_name: str) -> firestore.CollectionReference:
+        return db.collection(collection_name)
 
-def create_random_strings(is_digit:bool,characters:int):
+    @staticmethod
+    def get_document_id(collection_ref: Optional[firestore.CollectionReference]) -> str:
+        data_generator: Generator = collection_ref.stream()
+        data: firestore.DocumentSnapshot = next(data_generator)
+        return data.id
+
+
+def create_random_strings(is_digit: bool, characters: int):
     """
     ランダムな文字列を生成する関数。
     """
@@ -28,7 +45,7 @@ def create_random_strings(is_digit:bool,characters:int):
     else:
         return "".join([random.choice(string.ascii_letters) for _ in range(characters)])
 
-    
-if __name__=='__main__':
-    a=File.extract_from_file('/src/api/assets/order_strings.csv')
+
+if __name__ == '__main__':
+    a = File.extract_from_file('/src/api/assets/order_strings.csv')
     print(a)

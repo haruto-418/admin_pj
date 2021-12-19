@@ -1,7 +1,5 @@
-from fastapi import FastAPI
-from fastapi.exceptions import HTTPException
-
 import firebase_admin
+from fastapi import FastAPI
 from firebase_admin import auth
 from firebase_admin import firestore
 
@@ -27,9 +25,7 @@ if __name__ == 'api.main':
 @app.post('/users')
 async def create_random_user(how_many_users: int) -> dict:
     """
-    入力された整数分の名前・パスワード（6文字）は重複を考慮せずランダムに生成。
-    メアドは重複した場合エラーメッセージを返しその処理を飛ばす。
-    住所は東京都内の住所で重複を考慮せずランダムに生成。
+    ユーザーを指定の人数作成する関数。
     """
     user_id_arr: List[str] = []
     try:
@@ -53,19 +49,15 @@ async def delete_user(how_many_users: int) -> None:
     指定した人数分、ユーザーを削除する。
     """
     user_ref: firestore.CollectionReference = db.collection('users')
-    users: Generator = user_ref.stream()
     try:
         for _ in range(how_many_users):
-            user: firestore.DocumentSnapshot = next(users)
-            uid: str = user.id
-            user_ref.document(uid).delete()
-            models.User.delete_account(uid)
+            models.User.delete_account(user_ref)
         return {'200':'success!'}
     except TypeError as e:
         return {'firestore_error': '登録ユーザーは0人です。',
                 'error': e}
     except Exception as e:
-        return {'firestore_error': e}
+        return {'error': e}
 
 
 @app.post('/orders')
