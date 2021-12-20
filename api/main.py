@@ -1,35 +1,40 @@
 import csv
+import fastapi
 import firebase_admin
+import geohash
+
 from fastapi import FastAPI
 from firebase_admin import auth
 from firebase_admin import firestore
+from google.cloud.firestore import Client
+from google.cloud.firestore import CollectionReference
+from google.cloud.firestore import DocumentSnapshot
 
-from typing import Generator, List
+
+from typing import Generator
+from typing import List
 import names
 import random
-
-import geohash
 
 try:
     from common import functions
     from common import models
-    from common import type_classes
 except ModuleNotFoundError:
     from .common import functions
     from .common import models
-    from .common import type_classes
 
 
-app: FastAPI = FastAPI()
+app: fastapi.applications.FastAPI = FastAPI()
+
 firebase_admin.initialize_app()
-db: firestore = firestore.client()
+db: Client = firestore.client()
 
 
 @app.post('/users')
-async def create_random_user(how_many_users: int) -> dict:
+async def create_random_user(how_many_users: int) -> dict[str, str]:
     """ユーザーを指定の人数作成する関数。"""
     with open('/src/api/assets/address_strings.csv', 'r')as f:
-        reader: List = list(csv.DictReader(f))
+        reader: List[dict] = list(csv.DictReader(f))
     try:
         for _ in range(how_many_users):
             name: str = names.get_first_name()
@@ -39,6 +44,7 @@ async def create_random_user(how_many_users: int) -> dict:
             password: str = functions.create_random_strings(True, 6)
 
             user: models.User = models.User(name, email, location)
+
             user.create_account(password, db)
 
         return {'200': 'success!'}
@@ -47,9 +53,9 @@ async def create_random_user(how_many_users: int) -> dict:
 
 
 @app.delete('/users')
-async def delete_user(how_many_users: int) -> dict:
+async def delete_user(how_many_users: int) -> dict[str, str]:
     """指定した人数分、ユーザーを削除する。"""
-    user_ref: firestore.CollectionReference = db.collection('users')
+    user_ref: CollectionReference = db.collection('users')
     try:
         for _ in range(how_many_users):
             models.User.delete_account(user_ref)
@@ -62,7 +68,7 @@ async def delete_user(how_many_users: int) -> dict:
 
 
 @app.delete('/users/all')
-async def delete_all_users() -> dict:
+async def delete_all_users() -> dict[str, str]:
     """ユーザを全て削除する。"""
     try:
         id_arr: List[str] = functions.FirestoreFunc.get_all_document_id(
@@ -75,16 +81,16 @@ async def delete_all_users() -> dict:
 
 
 @app.post('/orders')
-def add_order(how_many_orders: int) -> dict:
+def add_order(how_many_orders: int) -> dict[str, str]:
     """オーダーを指定の個数作成する。"""
-    users = db.collection('users').stream()
+    users: Generator = db.collection('users').stream()
     order_strings: List[str] = []
     functions.File.read_file(
         '/src/api/assets/order_strings.csv', order_strings)
     try:
         for _ in range(how_many_orders):
-            user_doc = next(users)
-            user_dict = user_doc.to_dict()
+            user_doc: DocumentSnapshot = next(users)
+            user_dict: dict = user_doc.to_dict()
             db.collection('orders').add({
                 'createAt': firestore.SERVER_TIMESTAMP,
                 'customerId': user_doc.id,
@@ -107,10 +113,10 @@ def add_order(how_many_orders: int) -> dict:
 
 
 @app.delete('/orders/all')
-async def delete_all_orders() -> dict:
+async def delete_all_orders() -> dict[str, str]:
     """オーダーを全て削除する。"""
     try:
         functions.FirestoreFunc.delete_all(db, 'orders')
-        return {'200':'success!'}
+        return {'200': 'success!'}
     except Exception as e:
         {'error': e}
