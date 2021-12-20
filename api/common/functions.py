@@ -38,11 +38,11 @@ class FirestoreFunc(object):
     @staticmethod
     def get_all_document():
         pass
-    
+
     @staticmethod
     def get_all_document_id(db: firestore, coll_name: str) -> List[str]:
         id_arr: List[str] = []
-        docs: Generator = db.collection(coll_name).stream()
+        docs: firestore.generator = db.collection(coll_name).stream()
         for doc in docs:
             id_arr.append(doc.id)
         return id_arr
