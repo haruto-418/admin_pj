@@ -35,10 +35,7 @@ class FirestoreFunc(object):
         data: firestore.DocumentSnapshot = next(data_generator)
         return data.id
 
-    @staticmethod
-    def get_all_document():
-        pass
-
+    
     @staticmethod
     def get_all_document_id(db: firestore, coll_name: str) -> List[str]:
         id_arr: List[str] = []

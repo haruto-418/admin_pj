@@ -92,6 +92,7 @@ def add_order(how_many_orders: int) -> dict:
                 'shopperId': '',
                 'text': random.choice(order_strings)
             })
+            print('finish a roop')
         return {'200': 'success!'}
     except TypeError:
         return {'error': 'There are not enough amount of users.'}
