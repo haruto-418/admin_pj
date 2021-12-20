@@ -11,6 +11,7 @@ uvicorn = {extras = ["standard"], version = "^0.15.0"}
 firebase-admin = "^5.1.0"
 names = "^0.3.0"
 pytest = "^6.2.5"
+Geohash = "^1.0"
 
 [tool.poetry.dev-dependencies]
 firebase-admin = "^5.1.0"

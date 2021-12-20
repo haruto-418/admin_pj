@@ -81,8 +81,7 @@ def add_order(how_many_orders: int) -> dict:
     """オーダーを指定の個数作成する。"""
     users = db.collection('users').stream()
     order_strings: List[str] = []
-    with open('/src/api/assets/address_strings.csv', 'r')as f:
-        reader = list(csv.DictReader(f))
+    functions.File.read_file('/src/api/assets/order_strings.csv', order_strings)
     try:
         for _ in range(how_many_orders):
             user_doc = next(users)
@@ -93,15 +92,14 @@ def add_order(how_many_orders: int) -> dict:
                 'deliveryAddress': user_dict['address'],
                 'deliveryCharge': 0,
                 'deliveryPoint': {
-                    'geohash': '',
-                    'geopoint': firestore.GeoPoint(1, 1)
+                    'geohash': user_dict['homeAddressPoint']['geohash'],
+                    'geopoint': user_dict['homeAddressPoint']['geopoint'],
                 },
                 'maxQuotationPrice': 0,
                 'minQuotationPrice': 0,
                 'shopperId': '',
                 'text': random.choice(order_strings)
             })
-            print('finish a roop')
         return {'200': 'success!'}
     except TypeError:
         return {'error': 'There are not enough amount of users.'}
