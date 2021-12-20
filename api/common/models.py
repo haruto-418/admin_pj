@@ -2,6 +2,8 @@ import firebase_admin
 from firebase_admin import auth
 from firebase_admin import firestore
 
+import geohash
+
 try:
     from functions import FirestoreFunc
 except ModuleNotFoundError:
@@ -9,10 +11,10 @@ except ModuleNotFoundError:
 
 
 class User(object):
-    def __init__(self, name: str, email: str, address: str) -> None:
+    def __init__(self, name: str, email: str, location: dict) -> None:
         self.name: str = name
         self.email: str = email
-        self.address: str = address
+        self.location: dict = location
 
     def create_account(self, password: str, db_ref: firestore) -> None:
         """
@@ -22,7 +24,14 @@ class User(object):
             user: auth.UserRecord = auth.create_user(
                 email=self.email, password=password)
             db_ref.collection('users').document(user.uid).set(
-                {'name': self.name, 'email': self.email, 'address': self.address}
+                {'name': self.name,
+                 'email': self.email,
+                 'address': self.location['address'],
+                 'homeAddressPoint':{
+                    'geohash':geohash.encode(float(self.location['latitude']),float(self.location['longtitude'])),
+                    'geopoint':firestore.GeoPoint(float(self.location['latitude']),float(self.location['longtitude'])),
+                },
+                }
             )
         except Exception as e:
             return {"error": "fail to create user.", "error": e}
