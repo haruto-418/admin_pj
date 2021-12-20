@@ -25,8 +25,6 @@ firebase_admin.initialize_app()
 db: firestore = firestore.client()
 
 
-
-
 @app.post('/users')
 async def create_random_user(how_many_users: int) -> dict:
     """ユーザーを指定の人数作成する関数。"""
@@ -81,7 +79,8 @@ def add_order(how_many_orders: int) -> dict:
     """オーダーを指定の個数作成する。"""
     users = db.collection('users').stream()
     order_strings: List[str] = []
-    functions.File.read_file('/src/api/assets/order_strings.csv', order_strings)
+    functions.File.read_file(
+        '/src/api/assets/order_strings.csv', order_strings)
     try:
         for _ in range(how_many_orders):
             user_doc = next(users)
@@ -105,3 +104,13 @@ def add_order(how_many_orders: int) -> dict:
         return {'error': 'There are not enough amount of users.'}
     except Exception as e:
         return {'error': e}
+
+
+@app.delete('/orders/all')
+async def delete_all_orders() -> dict:
+    """オーダーを全て削除する。"""
+    try:
+        functions.FirestoreFunc.delete_all(db, 'orders')
+        return {'200':'success!'}
+    except Exception as e:
+        {'error': e}
