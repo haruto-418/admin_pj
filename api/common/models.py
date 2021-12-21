@@ -1,6 +1,8 @@
 import firebase_admin
 from firebase_admin import auth
 from firebase_admin import firestore
+from google.cloud.firestore import Client
+
 
 import geohash
 
@@ -16,7 +18,7 @@ class User(object):
         self.email: str = email
         self.location: dict = location
 
-    def create_account(self, password: str, db_ref: firestore) -> None:
+    def create_account(self, password: str, db_ref: Client) -> None:
         """
         firebase_authenticationとfirestoreにユーザーを作成する関数。
         """
@@ -27,11 +29,11 @@ class User(object):
                 {'name': self.name,
                  'email': self.email,
                  'address': self.location['address'],
-                 'homeAddressPoint':{
-                    'geohash':geohash.encode(float(self.location['latitude']),float(self.location['longtitude'])),
-                    'geopoint':firestore.GeoPoint(float(self.location['latitude']),float(self.location['longtitude'])),
-                },
-                }
+                 'homeAddressPoint': {
+                     'geohash': geohash.encode(float(self.location['latitude']), float(self.location['longtitude'])),
+                     'geopoint': firestore.GeoPoint(float(self.location['latitude']), float(self.location['longtitude'])),
+                 },
+                 }
             )
         except Exception as e:
             return {"error": "fail to create user.", "error": e}
@@ -39,7 +41,7 @@ class User(object):
     @staticmethod
     def delete_account(collection_ref) -> None:
         try:
-            user_id = FirestoreFunc.get_document_id(collection_ref)
+            user_id: List[str] = FirestoreFunc.get_document_id(collection_ref)
             collection_ref.document(user_id).delete()
             auth.delete_user(uid=user_id)
         except ValueError as e:

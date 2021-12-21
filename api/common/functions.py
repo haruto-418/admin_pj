@@ -1,4 +1,7 @@
 from firebase_admin import firestore
+from google.cloud.firestore import Client
+from google.cloud.firestore import CollectionReference
+from google.cloud.firestore import DocumentSnapshot
 
 from typing import Generator
 from typing import List
@@ -12,34 +15,33 @@ class File(object):
     def read_file(path: str, arr: List[str]) -> None:
         with open(path, 'r')as f:
             while True:
-                line = f.readline()
+                line: str = f.readline()
                 if not line:
                     break
                 arr.append(line)
 
     @staticmethod
     def extract_from_file(path: str) -> List[str]:
-        arr = []
+        arr: List = []
         File.read_file(path, arr)
         return random.choice(arr)
 
 
 class FirestoreFunc(object):
     @staticmethod
-    def get_collection_ref(db: firestore, collection_name: str) -> firestore.CollectionReference:
+    def get_collection_ref(db: Client, collection_name: str) -> CollectionReference:
         return db.collection(collection_name)
 
     @staticmethod
-    def get_document_id(collection_ref: Optional[firestore.CollectionReference]) -> str:
+    def get_document_id(collection_ref: Optional[CollectionReference]) -> str:
         data_generator: Generator = collection_ref.stream()
-        data: firestore.DocumentSnapshot = next(data_generator)
+        data: DocumentSnapshot = next(data_generator)
         return data.id
 
-    
     @staticmethod
     def get_all_document_id(db: firestore, coll_name: str) -> List[str]:
         id_arr: List[str] = []
-        docs: firestore.generator = db.collection(coll_name).stream()
+        docs: Generator = db.collection(coll_name).stream()
         for doc in docs:
             id_arr.append(doc.id)
         return id_arr
@@ -51,7 +53,7 @@ class FirestoreFunc(object):
             doc.reference.delete()
 
 
-def create_random_strings(is_digit: bool, characters: int):
+def create_random_strings(is_digit: bool, characters: int) -> str:
     """
     ランダムな文字列を生成する関数。
     """
