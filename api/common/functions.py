@@ -29,17 +29,17 @@ class File(object):
 
 class FirestoreFunc(object):
     @staticmethod
-    def get_collection_ref(db: Client, collection_name: str) -> CollectionReference:
-        return db.collection(collection_name)
+    def get_collection_ref(db: Client, coll_name: str) -> CollectionReference:
+        return db.collection(coll_name)
 
     @staticmethod
-    def get_document_id(collection_ref: Optional[CollectionReference]) -> str:
-        data_generator: Generator = collection_ref.stream()
-        data: DocumentSnapshot = next(data_generator)
+    def get_document_id(coll_ref: Optional[CollectionReference]) -> str:
+        datas: Generator = coll_ref.stream()
+        data: DocumentSnapshot = next(datas)
         return data.id
 
     @staticmethod
-    def get_all_document_id(db: firestore, coll_name: str) -> List[str]:
+    def get_all_document_id(db: Client, coll_name: str) -> List[str]:
         id_arr: List[str] = []
         docs: Generator = db.collection(coll_name).stream()
         for doc in docs:
@@ -47,7 +47,7 @@ class FirestoreFunc(object):
         return id_arr
 
     @staticmethod
-    def delete_all(db: firestore, coll_name: str) -> None:
+    def delete_all(db: Client, coll_name: str) -> None:
         docs: Generator = db.collection(coll_name).stream()
         for doc in docs:
             doc.reference.delete()
