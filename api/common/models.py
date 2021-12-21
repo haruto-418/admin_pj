@@ -18,14 +18,14 @@ class User(object):
         self.email: str = email
         self.location: dict = location
 
-    def create_account(self, password: str, db_ref: Client) -> None:
+    def create_account(self, password: str, db: Client) -> None:
         """
         firebase_authenticationとfirestoreにユーザーを作成する関数。
         """
         try:
             user: auth.UserRecord = auth.create_user(
                 email=self.email, password=password)
-            db_ref.collection('users').document(user.uid).set(
+            db.collection('users').document(user.uid).set(
                 {'name': self.name,
                  'email': self.email,
                  'address': self.location['address'],
@@ -39,10 +39,10 @@ class User(object):
             return {"error": "fail to create user.", "error": e}
 
     @staticmethod
-    def delete_account(collection_ref) -> None:
+    def delete_account(coll_ref) -> None:
         try:
-            user_id: List[str] = FirestoreFunc.get_document_id(collection_ref)
-            collection_ref.document(user_id).delete()
+            user_id: List[str] = FirestoreFunc.get_document_id(coll_ref)
+            coll_ref.document(user_id).delete()
             auth.delete_user(uid=user_id)
         except ValueError as e:
             return {'authentication_error': 'The uid is invalid.{}'.format(e)}

@@ -55,10 +55,10 @@ async def create_random_user(how_many_users: int) -> dict[str, str]:
 @app.delete('/users')
 async def delete_user(how_many_users: int) -> dict[str, str]:
     """指定した人数分、ユーザーを削除する。"""
-    user_ref: CollectionReference = db.collection('users')
+    user_coll_ref: CollectionReference = db.collection('users')
     try:
         for _ in range(how_many_users):
-            models.User.delete_account(user_ref)
+            models.User.delete_account(user_coll_ref)
         return {'200': 'success!'}
     except TypeError as e:
         return {'firestore_error': 'There are no users.',
