@@ -20,6 +20,7 @@
 - コンテナでシェルを起動し、/srcで、`poetry shell`を実行。
 <br>
 <br>
+
 ## 秘密鍵の場所
 プロジェクト直下に、`admin-cred.json`の名前で配置。
 <br>
