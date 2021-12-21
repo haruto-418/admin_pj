@@ -81,7 +81,7 @@ async def delete_all_users() -> dict[str, str]:
 
 
 @app.post('/orders')
-def add_order(how_many_orders: int) -> dict[str, str]:
+async def add_order(how_many_orders: int) -> dict[str, str]:
     """オーダーを指定の個数作成する。"""
     users: Generator = db.collection('users').stream()
     order_strings: List[str] = []
