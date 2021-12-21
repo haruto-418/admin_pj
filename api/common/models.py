@@ -1,32 +1,50 @@
 import firebase_admin
 from firebase_admin import auth
 from firebase_admin import firestore
+from google.cloud.firestore import Client
+
+
+import geohash
+
+try:
+    from functions import FirestoreFunc
+except ModuleNotFoundError:
+    from .functions import FirestoreFunc
 
 
 class User(object):
-    def __init__(self, name: str, email: str, address: str):
+    def __init__(self, name: str, email: str, location: dict) -> None:
         self.name: str = name
         self.email: str = email
-        self.address: str = address
+        self.location: dict = location
 
-    def create_account(self, password: str, db_instance: firestore):
+    def create_account(self, password: str, db_ref: Client) -> None:
         """
         firebase_authenticationとfirestoreにユーザーを作成する関数。
         """
         try:
             user: auth.UserRecord = auth.create_user(
                 email=self.email, password=password)
-            db_instance.collection('users').document(user.uid).set(
-                {'name': self.name, 'email': self.email, 'address': self.address}
+            db_ref.collection('users').document(user.uid).set(
+                {'name': self.name,
+                 'email': self.email,
+                 'address': self.location['address'],
+                 'homeAddressPoint': {
+                     'geohash': geohash.encode(float(self.location['latitude']), float(self.location['longtitude'])),
+                     'geopoint': firestore.GeoPoint(float(self.location['latitude']), float(self.location['longtitude'])),
+                 },
+                 }
             )
-            return user.uid
         except Exception as e:
-            return {"error": "ユーザー登録に失敗しました。", "error": e}
+            return {"error": "fail to create user.", "error": e}
 
-    def delete_account(uid):
+    @staticmethod
+    def delete_account(collection_ref) -> None:
         try:
-            auth.delete_user(uid=uid)
+            user_id: List[str] = FirestoreFunc.get_document_id(collection_ref)
+            collection_ref.document(user_id).delete()
+            auth.delete_user(uid=user_id)
         except ValueError as e:
-            return {'authentication_error': 'ユーザーIDが不正です。.{}'.format(e)}
+            return {'authentication_error': 'The uid is invalid.{}'.format(e)}
         except Exception as e:
-            return {'authentication_error': 'ユーザーの削除に失敗しました。{}'.format(e)}
+            return {'authentication_error': 'fail to delete user.{}'.format(e)}
