@@ -19,4 +19,8 @@
 ### 4. シェルの起動
 - コンテナでシェルを起動し、/srcで、`poetry shell`を実行。
 
+## 秘密鍵の場所
+プロジェクト直下に、`admin-cred.json`の名前で配置。
 
+## エミュレータの起動について
+プロジェクト直下で`firebase emulators:start`を実行。
