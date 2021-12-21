@@ -15,14 +15,14 @@ class File(object):
     def read_file(path: str, arr: List[str]) -> None:
         with open(path, 'r')as f:
             while True:
-                line:str = f.readline()
+                line: str = f.readline()
                 if not line:
                     break
                 arr.append(line)
 
     @staticmethod
     def extract_from_file(path: str) -> List[str]:
-        arr:List = []
+        arr: List = []
         File.read_file(path, arr)
         return random.choice(arr)
 
@@ -38,7 +38,6 @@ class FirestoreFunc(object):
         data: DocumentSnapshot = next(data_generator)
         return data.id
 
-    
     @staticmethod
     def get_all_document_id(db: firestore, coll_name: str) -> List[str]:
         id_arr: List[str] = []
@@ -54,7 +53,7 @@ class FirestoreFunc(object):
             doc.reference.delete()
 
 
-def create_random_strings(is_digit: bool, characters: int)->str:
+def create_random_strings(is_digit: bool, characters: int) -> str:
     """
     ランダムな文字列を生成する関数。
     """
