@@ -7,6 +7,8 @@ WORKDIR /src
 # pipを使ってpoetryをインストール
 RUN pip install poetry
 
+RUN apt update
+RUN apt-get install -y tig vim
 # poetryの定義ファイルをコピー (存在する場合)
 COPY pyproject.toml* poetry.lock* ./
 
