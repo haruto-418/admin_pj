@@ -30,7 +30,7 @@ firebase_admin.initialize_app()
 db: Client = firestore.client()
 
 
-@app.post('/users')
+@app.post('/v1/users')
 async def create_random_user(how_many_users: int) -> dict[str, str]:
     """ユーザーを指定の人数作成する関数。"""
     with open('/src/api/assets/address_strings.csv', 'r')as f:
@@ -52,7 +52,7 @@ async def create_random_user(how_many_users: int) -> dict[str, str]:
         return {'error': e}
 
 
-@app.delete('/users')
+@app.delete('/v1/users')
 async def delete_user(how_many_users: int) -> dict[str, str]:
     """指定した人数分、ユーザーを削除する。"""
     user_coll_ref: CollectionReference = db.collection('users')
@@ -67,7 +67,7 @@ async def delete_user(how_many_users: int) -> dict[str, str]:
         return {'error': e}
 
 
-@app.delete('/users/all')
+@app.delete('/v1/users/all')
 async def delete_all_users() -> dict[str, str]:
     """ユーザを全て削除する。"""
     try:
@@ -80,7 +80,7 @@ async def delete_all_users() -> dict[str, str]:
         return {'error': e}
 
 
-@app.post('/orders')
+@app.post('/v1/orders')
 async def add_order(how_many_orders: int) -> dict[str, str]:
     """オーダーを指定の個数作成する。"""
     users: Generator = db.collection('users').stream()
@@ -112,7 +112,7 @@ async def add_order(how_many_orders: int) -> dict[str, str]:
         return {'error': e}
 
 
-@app.delete('/orders/all')
+@app.delete('/v1/orders/all')
 async def delete_all_orders() -> dict[str, str]:
     """オーダーを全て削除する。"""
     try:
