@@ -25,5 +25,13 @@
 プロジェクト直下に、`admin-cred.json`の名前で配置。
 <br>
 <br>
+
 ## エミュレータの起動について
 プロジェクト直下で`firebase emulators:start`を実行。
+<br>
+<br>
+
+## 使用可能ツール
+- tig
+- vim 
+- git
