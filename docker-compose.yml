@@ -1,6 +1,6 @@
 version: '3'
 services:
-  favor_admin:
+  admin_pj:
     build: .
     volumes:
       - ~/.ssh/:/root/.ssh
@@ -10,6 +10,6 @@ services:
       GOOGLE_APPLICATION_CREDENTIALS: '/src/admin-cred.json'
       FIRESTORE_EMULATOR_HOST: 'host.docker.internal:8080'
       FIREBASE_AUTH_EMULATOR_HOST: 'host.docker.internal:9099'
-      GCLOUD_PROJECT: 'dev-favor'
+      GCLOUD_PROJECT: 'dev'
     ports:
       - 8001:8001
