@@ -93,7 +93,7 @@ async def add_order(how_many_orders: int) -> dict[str, str]:
             user_dict: dict = user_doc.to_dict()
             db.collection('orders').add({
                 'createAt': firestore.SERVER_TIMESTAMP,
-                'customerId': user_doc.id,
+                'userId': user_doc.id,
                 'deliveryAddress': user_dict['address'],
                 'deliveryCharge': 0,
                 'deliveryPoint': {
@@ -102,7 +102,7 @@ async def add_order(how_many_orders: int) -> dict[str, str]:
                 },
                 'maxQuotationPrice': 0,
                 'minQuotationPrice': 0,
-                'shopperId': '',
+                'workerId': '',
                 'text': random.choice(order_strings)
             })
         return {'200': 'success!'}
